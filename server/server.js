@@ -40,8 +40,6 @@ async function auth(req, res, next) {
 
         connection = await getConnection();
 
-        // อ่านตำแหน่งปัจจุบันจาก Oracle ทุกครั้ง เพื่อให้ถ้ามีการเปลี่ยนตำแหน่ง
-        // หรือเปลี่ยนสิทธิ์แล้ว มีผลทันทีโดยไม่ต้อง Logout/Login
         const employeeResult = await connection.execute(
             `SELECT
                e.EMP_ID,
@@ -360,6 +358,7 @@ masterRoutes("POSITIONS", "/api/positions", "POSITION_ID", "POSITION_NAME", "/po
 masterRoutes("STOPS", "/api/stops", "STOP_ID", "STOP_NAME", "/stops");
 
 // Vehicle Types ต้องรับทั้งชื่อประเภทและจำนวนที่นั่ง
+
 app.get("/api/vehicle-types", auth, requirePermission("/vehicle-types"), async (req, res) => {
     let connection;
     try {
@@ -492,25 +491,44 @@ app.get(
         let connection;
 
         try {
+            const { search } = req.query;
             connection = await getConnection();
 
-            const result = await connection.execute(
-                `SELECT
-           e.EMP_ID AS EMPID,
-           e.EMP_NAME AS EMPNAME,
-           e.EMP_SURNAME AS EMPSURNAME,
-           e.EMP_EMAIL AS EMPEMAIL,
-           e.DEPT_ID,
-           d.DEPT_NAME,
-           e.POSITION_ID,
-           p.POSITION_NAME
-         FROM EMPLOYEES e
-         LEFT JOIN DEPARTMENTS d ON d.DEPT_ID = e.DEPT_ID
-         LEFT JOIN POSITIONS p ON p.POSITION_ID = e.POSITION_ID
-         ORDER BY e.EMP_ID`,
-                [],
-                { outFormat: oracledb.OUT_FORMAT_OBJECT }
-            );
+            let sql = `
+                SELECT
+                    e.EMP_ID AS EMPID,
+                    e.EMP_NAME AS EMPNAME,
+                    e.EMP_SURNAME AS EMPSURNAME,
+                    e.EMP_EMAIL AS EMPEMAIL,
+                    e.DEPT_ID,
+                    d.DEPT_NAME,
+                    e.POSITION_ID,
+                    p.POSITION_NAME
+                FROM EMPLOYEES e
+                LEFT JOIN DEPARTMENTS d ON d.DEPT_ID = e.DEPT_ID
+                LEFT JOIN POSITIONS p ON p.POSITION_ID = e.POSITION_ID
+            `;
+
+            const binds = {};
+
+            // ถ้ามีการส่งค่า search เข้ามา ให้เพิ่มเงื่อนไข WHERE
+            if (search && search.trim() !== "") {
+                sql += `
+                    WHERE LOWER(e.EMP_ID) LIKE :searchTerm
+                       OR LOWER(e.EMP_NAME) LIKE :searchTerm
+                       OR LOWER(e.EMP_SURNAME) LIKE :searchTerm
+                       OR LOWER(e.EMP_EMAIL) LIKE :searchTerm
+                       OR LOWER(d.DEPT_NAME) LIKE :searchTerm
+                       OR LOWER(p.POSITION_NAME) LIKE :searchTerm
+                `;
+                binds.searchTerm = `%${search.trim().toLowerCase()}%`;
+            }
+
+            sql += ` ORDER BY e.EMP_ID`;
+
+            const result = await connection.execute(sql, binds, {
+                outFormat: oracledb.OUT_FORMAT_OBJECT,
+            });
 
             res.json(result.rows);
         } catch (error) {

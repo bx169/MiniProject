@@ -19,6 +19,9 @@ export default function Employee() {
   const [positions, setPositions] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
+  
+  // 1. เพิ่ม State สำหรับเก็บคำค้นหา
+  const [searchTerm, setSearchTerm] = useState("");
 
   async function load() {
     try {
@@ -43,7 +46,6 @@ export default function Employee() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // ฟังก์ชันสำหรับเปิด Modal
   function openModal() {
     const modalElement = document.getElementById("employeeModal");
     if (modalElement) {
@@ -52,7 +54,6 @@ export default function Employee() {
     }
   }
 
-  // ฟังก์ชันสำหรับปิด Modal
   function closeModal() {
     const modalElement = document.getElementById("employeeModal");
     if (modalElement) {
@@ -63,13 +64,11 @@ export default function Employee() {
     }
   }
 
-  // ปุ่มกดเพิ่มพนักงานใหม่
   function handleAdd() {
     reset();
     openModal();
   }
 
-  // ปุ่มกดแก้ไขข้อมูล (จะดึงข้อมูลใส่ Form แล้วเปิด Modal)
   function edit(emp) {
     setEditId(emp.EMPID);
     setForm({
@@ -98,7 +97,7 @@ export default function Employee() {
         await api.post("/employees", form);
       }
 
-      closeModal(); // ปิด Modal เมื่อบันทึกสำเร็จ
+      closeModal();
       reset();
 
       await Swal.fire({
@@ -141,6 +140,21 @@ export default function Employee() {
     }
   }
 
+  // 2. ฟังก์ชันกรองพนักงานตามคำค้นหา (ID, ชื่อ, นามสกุล, อีเมล, แผนก, ตำแหน่ง)
+  const filteredEmployees = employees.filter((e) => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return true;
+
+    return (
+      e.EMPID?.toString().toLowerCase().includes(term) ||
+      e.EMPNAME?.toLowerCase().includes(term) ||
+      e.EMPSURNAME?.toLowerCase().includes(term) ||
+      e.EMPEMAIL?.toLowerCase().includes(term) ||
+      e.DEPT_NAME?.toLowerCase().includes(term) ||
+      e.POSITION_NAME?.toLowerCase().includes(term)
+    );
+  });
+
   return (
     <div className="container py-4">
       {/* Header & ปุ่มเปิด Add Modal */}
@@ -154,7 +168,21 @@ export default function Employee() {
       {/* ตารางแสดงข้อมูล Employee List */}
       <div className="card shadow-sm">
         <div className="card-body">
-          <h5 className="card-title mb-3">รายการพนักงาน</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="card-title m-0">รายการพนักงาน</h5>
+            
+            {/* 3. เพิ่มช่อง Input ค้นหา */}
+            <div style={{ width: "300px" }}>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="ค้นหา (รหัส, ชื่อ, แผนก, ตำแหน่ง)..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
           <div className="table-responsive">
             <table className="table table-bordered table-hover align-middle">
               <thead className="table-light">
@@ -169,14 +197,15 @@ export default function Employee() {
                 </tr>
               </thead>
               <tbody>
-                {employees.length === 0 ? (
+                {/* 4. เปลี่ยนมา Map ตัวแปร filteredEmployees */}
+                {filteredEmployees.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="text-center text-muted py-3">
-                      ไม่มีข้อมูลพนักงาน
+                      {searchTerm ? "ไม่พบข้อมูลพนักงานที่ตรงกับการค้นหา" : "ไม่มีข้อมูลพนักงาน"}
                     </td>
                   </tr>
                 ) : (
-                  employees.map((e) => (
+                  filteredEmployees.map((e) => (
                     <tr key={e.EMPID}>
                       <td>{e.EMPID}</td>
                       <td>{e.EMPNAME}</td>
