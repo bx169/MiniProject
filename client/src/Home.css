@@ -1,0 +1,144 @@
+/* พื้นหลังและโครงสร้างหน้า Guest */
+.home-guest-wrapper {
+  min-height: calc(100vh - 70px);
+  background-color: #f3f6fa;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* การ์ดตรงกลาง */
+.hero-card {
+  width: 100%;
+  max-width: 860px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(18, 48, 89, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+/* ฝั่งซ้าย (สีน้ำเงินเข้ม) */
+.hero-left {
+  background-color: #123059;
+  color: #ffffff;
+}
+
+.badge-custom {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.hero-subtitle {
+  color: #94a3b8;
+  font-size: 0.88rem;
+}
+
+/* Graphic รถบัสฝั่งซ้าย */
+.bus-card-mock {
+  background-color: #ffffff;
+  border-radius: 14px;
+  color: #333;
+}
+
+.bus-window {
+  height: 26px;
+  background-color: #e2e8f0;
+  border-radius: 6px;
+}
+
+.bus-code {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #123059;
+}
+
+.dot-yellow {
+  width: 8px;
+  height: 8px;
+  background-color: #f59e0b;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.bus-wheel {
+  width: 26px;
+  height: 26px;
+  background-color: #1e293b;
+  border-radius: 50%;
+  border: 4px solid #94a3b8;
+}
+
+/* ฝั่งขวา (สีขาว) */
+.hero-right {
+  background-color: #ffffff;
+}
+
+.icon-welcome-box {
+  width: 44px;
+  height: 44px;
+  background-color: #e0f2fe;
+  border-radius: 12px;
+}
+
+.welcome-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.welcome-desc {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* ปุ่มเข้าสู่ระบบ */
+.btn-login-main {
+  background-color: #1d6fb8;
+  color: #ffffff;
+  border: none;
+  padding: 11px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.btn-login-main:hover {
+  background-color: #123059;
+  color: #ffffff;
+}
+
+.register-text {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.register-link {
+  color: #1d6fb8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+.footer-text {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* การ์ด Dashboard หลังล็อกอิน */
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
